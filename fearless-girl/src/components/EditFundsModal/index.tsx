@@ -2,10 +2,11 @@ import * as React from "react";
 
 import gql from "graphql-tag";
 import { Mutation, Query } from "react-apollo";
-import injectSheet, { WithSheet } from "react-jss";
+import injectSheet, { Styles, WithSheet } from "react-jss";
 import { compose, withHandlers, withState } from "recompose";
 
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -37,29 +38,54 @@ const modifyFundsMutation = gql`
   }
 `;
 
-const styles = {
+const styles: Styles = {
   actionBar: {
     justifyContent: "space-between"
   },
   input: {
+    marginBottom: "1em",
     marginTop: "1em"
+  },
+  resultBar: {
+    justifyContent: "center"
+  },
+  spinner: {
+    position: "absolute",
+    right: "1.5em",
+    top: "1.5em"
   }
 };
 
 interface Props {
   open: boolean;
+  onClose: () => void;
 }
 interface InnerProps extends WithSheet<typeof styles>, Props {
   inputAmount: string;
   onChangeAmount: (e: any) => void;
 }
 
-const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
-  <Dialog open={open}>
-    <DialogTitle>Modify funds</DialogTitle>
-    <Mutation mutation={modifyFundsMutation}>
-      {modifyFunds => (
+const Page = ({
+  classes,
+  inputAmount,
+  onChangeAmount,
+  open,
+  onClose
+}: InnerProps) => (
+  <Dialog onClose={onClose} open={open}>
+    <Mutation
+      mutation={modifyFundsMutation}
+      onCompleted={() => setTimeout(onClose, 2000)}
+    >
+      {(
+        modifyFunds,
+        { error: mutationError, loading: mutationLoading, data: mutationData }
+      ) => (
         <React.Fragment>
+          {mutationLoading && (
+            <CircularProgress className={classes.spinner} size={25} />
+          )}
+          <DialogTitle>Modify funds</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Add or remove funds from your account.
@@ -77,6 +103,7 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
               <Input
                 id="amount-field"
                 autoFocus
+                disabled={mutationLoading}
                 type="number"
                 value={inputAmount}
                 onChange={onChangeAmount}
@@ -85,30 +112,53 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
                 }
               />
             </FormControl>
+
+            {mutationError && (
+              <DialogContentText>
+                {mutationError.graphQLErrors.reduce(
+                  (fullMessage, error) => fullMessage + error.message,
+                  "Error: "
+                )}
+              </DialogContentText>
+            )}
           </DialogContent>
-          <DialogActions className={classes.actionBar}>
-            <Button
-              onClick={() =>
-                modifyFunds({
-                  variables: {
-                    changeAmount: Number.parseFloat(inputAmount) * -1
-                  }
-                })
-              }
-            >
-              Withdraw
-            </Button>
-            <Button
-              color="primary"
-              onClick={() =>
-                modifyFunds({
-                  variables: { changeAmount: Number.parseFloat(inputAmount) }
-                })
-              }
-            >
-              Deposit
-            </Button>
-          </DialogActions>
+          {!!mutationData ? (
+            <DialogActions className={classes.resultBar}>
+              <Button disabled>Success!</Button>
+            </DialogActions>
+          ) : (
+            <DialogActions className={classes.actionBar}>
+              <Button
+                disabled={
+                  inputAmount === "" || mutationLoading || !!mutationData
+                }
+                onClick={() => {
+                  modifyFunds({
+                    variables: {
+                      changeAmount: Number.parseFloat(inputAmount) * -1
+                    }
+                  });
+                }}
+              >
+                Withdraw
+              </Button>
+              <Button
+                disabled={
+                  inputAmount === "" || mutationLoading || !!mutationData
+                }
+                color="primary"
+                onClick={() => {
+                  modifyFunds({
+                    variables: {
+                      changeAmount: Number.parseFloat(inputAmount)
+                    }
+                  });
+                }}
+              >
+                Deposit
+              </Button>
+            </DialogActions>
+          )}
         </React.Fragment>
       )}
     </Mutation>
@@ -116,7 +166,7 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
 );
 
 export default compose<InnerProps, Props>(
-  withState("inputAmount", "editAmount", 0),
+  withState("inputAmount", "editAmount", ""),
   withHandlers({
     onChangeAmount: ({ editAmount }) => (
       e: React.SyntheticEvent<HTMLInputElement>

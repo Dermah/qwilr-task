@@ -32,7 +32,7 @@ const resolvers = {
   Mutation: {
     modifyFunds: (_, { changeAmount }) => {
       if (cashInHand + changeAmount < 0) {
-        throw new Error(`Not enough funds to withdraw $${changeAmount * -1}`);
+        throw new Error(`Not enough funds to withdraw $${changeAmount * -1}.`);
       }
       cashInHand += changeAmount;
 

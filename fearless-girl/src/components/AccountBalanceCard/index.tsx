@@ -55,7 +55,10 @@ const AccountBalanceCard = ({
             Change Balance
           </Button>
         </CardActions>
-        <EditFundsModal open={modalOpen} />
+        <EditFundsModal
+          onClose={() => changeModalOpen(false)}
+          open={modalOpen}
+        />
       </Card>
     )}
   </Query>
