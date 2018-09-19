@@ -1,9 +1,13 @@
 import * as React from "react";
+import injectSheet, { Styles, WithSheet } from "react-jss";
+import { compose, withState } from "recompose";
 
 import gql from "graphql-tag";
 import { Query } from "react-apollo";
 
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 
@@ -18,7 +22,22 @@ const getFundsQuery = gql`
   }
 `;
 
-const AccountBalanceCard = () => (
+const styles: Styles = {
+  actionArea: {
+    flexDirection: "row-reverse"
+  }
+};
+
+interface InnerProps extends WithSheet<typeof styles> {
+  modalOpen: boolean;
+  changeModalOpen: (open: boolean) => void;
+}
+
+const AccountBalanceCard = ({
+  modalOpen,
+  changeModalOpen,
+  classes
+}: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
       <Card>
@@ -31,10 +50,18 @@ const AccountBalanceCard = () => (
             data.viewer.cash.toString()) ||
             "-"}
         </CardContent>
-        <EditFundsModal open={true} />
+        <CardActions className={classes.actionArea}>
+          <Button color="primary" onClick={() => changeModalOpen(true)}>
+            Change Balance
+          </Button>
+        </CardActions>
+        <EditFundsModal open={modalOpen} />
       </Card>
     )}
   </Query>
 );
 
-export default AccountBalanceCard;
+export default compose<InnerProps, {}>(
+  withState("modalOpen", "changeModalOpen", false),
+  injectSheet(styles)
+)(AccountBalanceCard);
