@@ -2,16 +2,22 @@ import { GraphQLServer } from "graphql-yoga";
 
 const typeDefs = `
   type Query {
-    hello(name: String): String
+    viewer: User
+  }
+
+  type User {
+    cash: Float!
   }
 `;
 
+let cashInHand = 0;
+
 const resolvers = {
   Query: {
-    hello: (_, { name }) => {
-      const returnValue = !name ? `Hello ${name || "World!"}` : null;
-      return returnValue;
-    }
+    viewer: () => ({})
+  },
+  User: {
+    cash: () => cashInHand
   }
 };
 
