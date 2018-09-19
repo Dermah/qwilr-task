@@ -76,7 +76,7 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
 
-"@types/jss@^9.5.3":
+"@types/jss@*", "@types/jss@^9.5.3":
   version "9.5.5"
   resolved "https://registry.yarnpkg.com/@types/jss/-/jss-9.5.5.tgz#57ed99ae768c203677cd64e0ce0df02c74075bf8"
   dependencies:
@@ -100,6 +100,15 @@
     "@types/node" "*"
     "@types/react" "*"
 
+"@types/react-jss@^8.6.0":
+  version "8.6.0"
+  resolved "https://registry.yarnpkg.com/@types/react-jss/-/react-jss-8.6.0.tgz#ce8009fb65e1986431cec372dff18d7087cf7a48"
+  dependencies:
+    "@types/jss" "*"
+    "@types/react" "*"
+    "@types/theming" "*"
+    csstype "^2.0.0"
+
 "@types/react-transition-group@^2.0.8":
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-2.0.14.tgz#afd0cd785a97f070b55765e9f9d76ff568269001"
@@ -112,6 +121,18 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
+
+"@types/recompose@^0.26.5":
+  version "0.26.5"
+  resolved "https://registry.yarnpkg.com/@types/recompose/-/recompose-0.26.5.tgz#8496b63c535a60c3584b8b0aca54bfb86679ed70"
+  dependencies:
+    "@types/react" "*"
+
+"@types/theming@*":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@types/theming/-/theming-1.3.0.tgz#749099bf624756a4e8f8feb525da691715af32ac"
+  dependencies:
+    "@types/react" "*"
 
 "@types/zen-observable@^0.8.0":
   version "0.8.0"
