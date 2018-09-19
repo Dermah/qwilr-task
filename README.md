@@ -11,3 +11,9 @@ yarn --cwd charging-bull
 ```sh
 yarn --cwd charging-bull start
 ```
+
+## Develop
+
+```sh
+yarn --cwd charging-bull dev
+```
