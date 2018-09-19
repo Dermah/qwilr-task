@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import gql from "graphql-tag";
-import { Query } from "react-apollo";
+import { Mutation, Query } from "react-apollo";
 import injectSheet, { WithSheet } from "react-jss";
 import { compose, withHandlers, withState } from "recompose";
 
@@ -20,6 +20,17 @@ const getFundsQuery = gql`
   query getFunds {
     viewer {
       cash
+    }
+  }
+`;
+
+const modifyFundsMutation = gql`
+  mutation modifyFunds($changeAmount: Float!) {
+    modifyFunds(changeAmount: $changeAmount) {
+      user {
+        cash
+      }
+      newFundsAmount
     }
   }
 `;
@@ -44,34 +55,61 @@ interface InnerProps extends WithSheet<typeof styles>, Props {
 const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
   <Dialog open={open}>
     <DialogTitle>Modify funds</DialogTitle>
-    <DialogContent>
-      <DialogContentText>
-        Add or remove funds from your account.
-      </DialogContentText>
-      <Query query={getFundsQuery}>
-        {({ loading, error, data }) => (
-          <DialogContentText>
-            You currently have ${data && data.viewer && data.viewer.cash} in
-            funds
-          </DialogContentText>
-        )}
-      </Query>
-      <FormControl className={classes.input} fullWidth>
-        <InputLabel htmlFor="amount-field">Amount</InputLabel>
-        <Input
-          id="amount-field"
-          autoFocus
-          type="number"
-          value={inputAmount}
-          onChange={onChangeAmount}
-          startAdornment={<InputAdornment position="start">$</InputAdornment>}
-        />
-      </FormControl>
-    </DialogContent>
-    <DialogActions className={classes.actionBar}>
-      <Button>Remove</Button>
-      <Button color="primary">Add</Button>
-    </DialogActions>
+    <Mutation mutation={modifyFundsMutation}>
+      {modifyFunds => (
+        <React.Fragment>
+          <DialogContent>
+            <DialogContentText>
+              Add or remove funds from your account.
+            </DialogContentText>
+            <Query query={getFundsQuery}>
+              {({ loading, error, data }) => (
+                <DialogContentText>
+                  You currently have ${data && data.viewer && data.viewer.cash}{" "}
+                  in funds
+                </DialogContentText>
+              )}
+            </Query>
+            <FormControl className={classes.input} fullWidth>
+              <InputLabel htmlFor="amount-field">Amount</InputLabel>
+              <Input
+                id="amount-field"
+                autoFocus
+                type="number"
+                value={inputAmount}
+                onChange={onChangeAmount}
+                startAdornment={
+                  <InputAdornment position="start">$</InputAdornment>
+                }
+              />
+            </FormControl>
+          </DialogContent>
+          <DialogActions className={classes.actionBar}>
+            <Button
+              onClick={() =>
+                modifyFunds({
+                  variables: {
+                    changeAmount: Number.parseFloat(inputAmount) * -1
+                  }
+                })
+              }
+            >
+              Remove
+            </Button>
+            <Button
+              color="primary"
+              onClick={() =>
+                modifyFunds({
+                  variables: { changeAmount: Number.parseFloat(inputAmount) }
+                })
+              }
+            >
+              Add
+            </Button>
+          </DialogActions>
+        </React.Fragment>
+      )}
+    </Mutation>
   </Dialog>
 );
 
