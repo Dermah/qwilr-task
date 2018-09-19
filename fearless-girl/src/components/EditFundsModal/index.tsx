@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import gql from "graphql-tag";
+import { Query } from "react-apollo";
 import injectSheet, { WithSheet } from "react-jss";
 import { compose, withHandlers, withState } from "recompose";
 
@@ -13,6 +15,14 @@ import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import InputLabel from "@material-ui/core/InputLabel";
+
+const getFundsQuery = gql`
+  query getFunds {
+    viewer {
+      cash
+    }
+  }
+`;
 
 const styles = {
   actionBar: {
@@ -38,7 +48,14 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
       <DialogContentText>
         Add or remove funds from your account.
       </DialogContentText>
-      <DialogContentText>You currently have funds</DialogContentText>
+      <Query query={getFundsQuery}>
+        {({ loading, error, data }) => (
+          <DialogContentText>
+            You currently have ${data && data.viewer && data.viewer.cash} in
+            funds
+          </DialogContentText>
+        )}
+      </Query>
       <FormControl className={classes.input} fullWidth>
         <InputLabel htmlFor="amount-field">Amount</InputLabel>
         <Input
