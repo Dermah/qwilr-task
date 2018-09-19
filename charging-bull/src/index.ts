@@ -8,6 +8,14 @@ const typeDefs = `
   type User {
     cash: Float!
   }
+
+  type Mutation {
+    modifyFunds (changeAmount: Float!): ModifyFundsPayload
+  }
+  type ModifyFundsPayload {
+    user: User
+    newFundsAmount: Float
+  }
 `;
 
 let cashInHand = 0;
@@ -18,6 +26,19 @@ const resolvers = {
   },
   User: {
     cash: () => cashInHand
+  },
+  Mutation: {
+    modifyFunds: (_, { changeAmount }) => {
+      if (cashInHand + changeAmount < 0) {
+        throw new Error(`Not enough funds to withdraw $${changeAmount * -1}`);
+      }
+      cashInHand += changeAmount;
+
+      return {
+        user: {},
+        newFundsAmount: cashInHand
+      };
+    }
   }
 };
 
