@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "react-apollo";
+import ApolloClient, { gql } from "apollo-boost";
+import { ApolloProvider, Query } from "react-apollo";
 
 import "./App.css";
 
@@ -20,9 +20,27 @@ class App extends React.Component {
             <img src={logo} className="App-logo" alt="logo" />
             <h1 className="App-title">Welcome to React</h1>
           </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.tsx</code> and save to reload.
-          </p>
+          <Query
+            query={gql`
+              {
+                viewer {
+                  cash
+                }
+              }
+            `}
+          >
+            {({ loading, error, data }) => (
+              <p className="App-intro">
+                Did you know you have{" "}
+                {(data &&
+                  data.viewer &&
+                  typeof data.viewer.cash === "number" &&
+                  data.viewer.cash.toString()) ||
+                  "some"}{" "}
+                dollarydoos?
+              </p>
+            )}
+          </Query>
         </div>
       </ApolloProvider>
     );
