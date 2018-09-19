@@ -6,6 +6,7 @@ const typeDefs = `
   }
 
   type User {
+    id: ID!
     cash: Float!
   }
 
@@ -18,11 +19,12 @@ const typeDefs = `
   }
 `;
 
+const SPUTNIK_USER_ID = "sputnik-12345";
 let cashInHand = 0;
 
 const resolvers = {
   Query: {
-    viewer: () => ({})
+    viewer: () => ({ id: SPUTNIK_USER_ID })
   },
   User: {
     cash: () => cashInHand
@@ -35,7 +37,7 @@ const resolvers = {
       cashInHand += changeAmount;
 
       return {
-        user: {},
+        user: { id: SPUTNIK_USER_ID },
         newFundsAmount: cashInHand
       };
     }

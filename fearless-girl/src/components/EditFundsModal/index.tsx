@@ -19,6 +19,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 const getFundsQuery = gql`
   query getFunds {
     viewer {
+      id
       cash
     }
   }
@@ -28,6 +29,7 @@ const modifyFundsMutation = gql`
   mutation modifyFunds($changeAmount: Float!) {
     modifyFunds(changeAmount: $changeAmount) {
       user {
+        id
         cash
       }
       newFundsAmount
