@@ -96,7 +96,7 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
                 })
               }
             >
-              Remove
+              Withdraw
             </Button>
             <Button
               color="primary"
@@ -106,7 +106,7 @@ const Page = ({ classes, inputAmount, onChangeAmount, open }: InnerProps) => (
                 })
               }
             >
-              Add
+              Deposit
             </Button>
           </DialogActions>
         </React.Fragment>
