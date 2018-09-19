@@ -1,11 +1,9 @@
 import * as React from "react";
 
-import ApolloClient, { gql } from "apollo-boost";
-import { ApolloProvider, Query } from "react-apollo";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "react-apollo";
 
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-
+import AccountBalanceCard from "./components/AccountBalanceCard";
 import Page from "./components/Page";
 
 const client = new ApolloClient({
@@ -17,29 +15,7 @@ class App extends React.Component {
     return (
       <ApolloProvider client={client}>
         <Page>
-          <Query
-            query={gql`
-              {
-                viewer {
-                  cash
-                }
-              }
-            `}
-          >
-            {({ loading, error, data }) => (
-              <Card>
-                <CardContent>
-                  Did you know you have{" "}
-                  {(data &&
-                    data.viewer &&
-                    typeof data.viewer.cash === "number" &&
-                    data.viewer.cash.toString()) ||
-                    "some"}{" "}
-                  dollarydoos?
-                </CardContent>
-              </Card>
-            )}
-          </Query>
+          <AccountBalanceCard />
         </Page>
       </ApolloProvider>
     );
