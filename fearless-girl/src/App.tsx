@@ -5,6 +5,7 @@ import { ApolloProvider } from "react-apollo";
 
 import AccountBalanceCard from "./components/AccountBalanceCard";
 import Footer from "./components/Footer";
+import Holdings from "./components/Holdings";
 import Page from "./components/Page";
 import StockLists from "./components/StockLists";
 
@@ -18,6 +19,7 @@ class App extends React.Component {
       <ApolloProvider client={client}>
         <Page>
           <AccountBalanceCard />
+          <Holdings />
           <StockLists />
           <Footer />
         </Page>

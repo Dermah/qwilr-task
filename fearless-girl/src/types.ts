@@ -3,3 +3,10 @@ interface Stock {
   name: string;
   latestPrice: number;
 }
+
+interface Holding {
+  id: string;
+  stock: Stock;
+  quantity: number;
+  purchasePrice: number;
+}
