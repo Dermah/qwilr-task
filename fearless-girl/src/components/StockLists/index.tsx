@@ -5,6 +5,9 @@ import { compose } from "recompose";
 
 import gql from "graphql-tag";
 
+import { Typography } from "@material-ui/core";
+import StockCard from "../StockCard";
+
 const getStockLists = gql`
   query getStockLists {
     lists {
@@ -17,12 +20,20 @@ const getStockLists = gql`
   }
 `;
 
-const styles: Styles = {};
+const styles: Styles = {
+  listSection: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  section: {
+    marginTop: "1em"
+  }
+};
 
 interface InnerProps extends WithSheet<typeof styles> {}
 
-const StockLists = () => (
-  <React.Fragment>
+const StockLists = ({ classes }: InnerProps) => (
+  <section className={classes.section}>
     <Query query={getStockLists}>
       {({ loading, error, data }) => {
         if (loading) {
@@ -30,13 +41,18 @@ const StockLists = () => (
         } else {
           return (
             <React.Fragment>
-              {JSON.stringify(data.lists.gainers)}
+              <Typography variant="display1">Gainers</Typography>
+              <div className={classes.listSection}>
+                {(data.lists.gainers as Stock[]).map((stock, i) => (
+                  <StockCard key={i} stock={stock} />
+                ))}
+              </div>
             </React.Fragment>
           );
         }
       }}
     </Query>
-  </React.Fragment>
+  </section>
 );
 
 export default compose<InnerProps, {}>(injectSheet(styles))(StockLists);
