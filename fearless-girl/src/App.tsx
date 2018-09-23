@@ -4,6 +4,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
 import AccountBalanceCard from "./components/AccountBalanceCard";
+import Footer from "./components/Footer";
 import Page from "./components/Page";
 
 const client = new ApolloClient({
@@ -16,6 +17,7 @@ class App extends React.Component {
       <ApolloProvider client={client}>
         <Page>
           <AccountBalanceCard />
+          <Footer />
         </Page>
       </ApolloProvider>
     );
