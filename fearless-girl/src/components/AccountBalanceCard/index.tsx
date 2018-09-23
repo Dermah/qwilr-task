@@ -25,6 +25,9 @@ const getFundsQuery = gql`
 const styles: Styles = {
   actionArea: {
     flexDirection: "row-reverse"
+  },
+  card: {
+    maxWidth: "400px"
   }
 };
 
@@ -40,7 +43,7 @@ const AccountBalanceCard = ({
 }: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
-      <Card>
+      <Card className={classes.card}>
         <CardHeader title="Account Balance" />
         <CardContent>
           $
