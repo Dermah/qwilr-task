@@ -1,6 +1,7 @@
 import { GraphQLServer } from "graphql-yoga";
 
 import { IEXClient } from "iex-api";
+import { QuoteResponse } from "iex-api/apis/stocks";
 import * as _fetch from "isomorphic-fetch";
 
 const iex = new IEXClient(_fetch);
@@ -10,10 +11,14 @@ const typeDefs = `
   type Query {
     # The currently logged in user. There is no authentication at this time
     viewer: User
+
     # Field for querying stock information
     stock (
       id: ID!
     ): Stock
+
+    # Interesting lists of Stocks to consider
+    lists: StockLists
   }
 
   type User {
@@ -29,6 +34,10 @@ const typeDefs = `
     latestPrice: Float
   }
 
+  type StockLists {
+    gainers: [Stock]
+  }
+
   type Mutation {
     modifyFunds (changeAmount: Float!): ModifyFundsPayload
   }
@@ -41,19 +50,26 @@ const typeDefs = `
 const SPUTNIK_USER_ID = "sputnik-12345";
 let cashInHand = 0;
 
+const quoteToStock = (iexQuote: QuoteResponse) => ({
+  id: iexQuote.symbol,
+  latestPrice: iexQuote.latestPrice
+});
+
 const resolvers = {
   Query: {
     viewer: () => ({ id: SPUTNIK_USER_ID }),
     stock: async (_, { id }) => {
       const quote = await iex.stockQuote(id);
-      return {
-        id: quote.symbol,
-        latestPrice: quote.latestPrice
-      };
-    }
+      return quoteToStock(quote);
+    },
+    lists: () => ({})
   },
   User: {
     cash: () => cashInHand
+  },
+  StockLists: {
+    gainers: async () =>
+      (await iex.stockMarketListTopTen("gainers")).map(quoteToStock)
   },
   Mutation: {
     modifyFunds: (_, { changeAmount }) => {
