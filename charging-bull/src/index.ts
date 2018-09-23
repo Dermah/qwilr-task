@@ -113,26 +113,27 @@ const resolvers = {
       }
     },
     buyStock: async (_, { id, quantity }) => {
+      const ID = (id as string).toUpperCase();
       // The string 'Unknown symbol' is returned if iex.stockQuote fails
-      const quote = (await iex.stockQuote(id)) as string | QuoteResponse;
+      const quote = (await iex.stockQuote(ID)) as string | QuoteResponse;
       if (typeof quote === "string") {
-        throw new Error(`Could not get quote for '${id}'`);
+        throw new Error(`Could not get quote for '${ID}'`);
       }
 
       const cost = quote.latestPrice * quantity;
       if (cost > getCashInHand()) {
         throw new Error(
-          `Not enough funds to pay for ${quantity} of ${id} (need $${cost})`
+          `Not enough funds to pay for ${quantity} of ${ID} (need $${cost})`
         );
       } else if (cost <= 0) {
         throw new Error(`Invalid quantity`);
       }
 
-      changeHolding(id, quantity, quote.latestPrice);
+      changeHolding(ID, quantity, quote.latestPrice);
       modifyFunds(cost);
       return {
         user: { id: SPUTNIK_USER_ID },
-        holding: getHolding(id)
+        holding: getHolding(ID)
       };
     }
   }
