@@ -3,6 +3,7 @@ import { GraphQLServer } from "graphql-yoga";
 import { IEXClient } from "iex-api";
 import { QuoteResponse } from "iex-api/apis/stocks";
 import * as _fetch from "isomorphic-fetch";
+import { getCashInHand, modifyFunds } from "./db";
 
 const iex = new IEXClient(_fetch);
 
@@ -63,7 +64,6 @@ const typeDefs = `
 `;
 
 const SPUTNIK_USER_ID = "sputnik-12345";
-let cashInHand = 0;
 
 const quoteToStock = (iexQuote: QuoteResponse) => ({
   id: iexQuote.symbol,
@@ -81,7 +81,7 @@ const resolvers = {
     lists: () => ({})
   },
   User: {
-    cash: () => cashInHand
+    cash: () => getCashInHand()
   },
   StockLists: {
     gainers: async () =>
@@ -89,15 +89,15 @@ const resolvers = {
   },
   Mutation: {
     modifyFunds: (_, { changeAmount }) => {
-      if (cashInHand + changeAmount < 0) {
+      try {
+        const funds = modifyFunds(changeAmount);
+        return {
+          user: { id: SPUTNIK_USER_ID },
+          newFundsAmount: funds
+        };
+      } catch (e) {
         throw new Error(`Not enough funds to withdraw $${changeAmount * -1}.`);
       }
-      cashInHand += changeAmount;
-
-      return {
-        user: { id: SPUTNIK_USER_ID },
-        newFundsAmount: cashInHand
-      };
     },
     buyStock: async (_, { id, quantity }) => {
       // The string 'Unknown symbol' is returned if iex.stockQuote fails
@@ -107,9 +107,9 @@ const resolvers = {
       }
 
       const cost = quote.latestPrice * quantity;
-      if (cost > cashInHand) {
+      if (cost > getCashInHand()) {
         throw new Error(
-          `Not enough funds to pay for ${quantity} of ${id} (need ${cost})`
+          `Not enough funds to pay for ${quantity} of ${id} (need $${cost})`
         );
       } else if (cost <= 0) {
         throw new Error(`Invalid quantity`);
