@@ -30,8 +30,10 @@ const typeDefs = `
   type Stock {
     # The same as the stock code (i.e. GOOG for google)
     id: ID!
+    # The name of the company
+    name: String!
     # From IEX: "the IEX real time price, the 15 minute delayed market price, or the previous close price"
-    latestPrice: Float
+    latestPrice: Float!
   }
 
   type StockLists {
@@ -52,6 +54,7 @@ let cashInHand = 0;
 
 const quoteToStock = (iexQuote: QuoteResponse) => ({
   id: iexQuote.symbol,
+  name: iexQuote.companyName,
   latestPrice: iexQuote.latestPrice
 });
 
