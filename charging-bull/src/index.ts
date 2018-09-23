@@ -23,8 +23,11 @@ const typeDefs = `
 
   type User {
     id: ID!
+
     # The amount of funds current available to the user for purchasing stocks with
     cash: Float!
+
+    holdings: [Holding]
   }
 
   type Stock {
@@ -36,16 +39,26 @@ const typeDefs = `
     latestPrice: Float!
   }
 
+  type Holding {
+    stock: Stock!
+    purchasePrice: Float!
+  }
+
   type StockLists {
     gainers: [Stock]
   }
 
   type Mutation {
-    modifyFunds (changeAmount: Float!): ModifyFundsPayload
+    modifyFunds (changeAmount: Float!): ModifyFundsPayload!
+    buyStock (id: ID!, quantity: Int!): BuyStockPayload!
   }
   type ModifyFundsPayload {
-    user: User
-    newFundsAmount: Float
+    user: User!
+    newFundsAmount: Float!
+  }
+  type BuyStockPayload {
+    user: User!
+    holding: Holding!
   }
 `;
 
@@ -85,6 +98,22 @@ const resolvers = {
         user: { id: SPUTNIK_USER_ID },
         newFundsAmount: cashInHand
       };
+    },
+    buyStock: async (_, { id, quantity }) => {
+      // The string 'Unknown symbol' is returned if iex.stockQuote fails
+      const quote = (await iex.stockQuote(id)) as string | QuoteResponse;
+      if (typeof quote === "string") {
+        throw new Error(`Could not get quote for '${id}'`);
+      }
+
+      const cost = quote.latestPrice * quantity;
+      if (cost > cashInHand) {
+        throw new Error(
+          `Not enough funds to pay for ${quantity} of ${id} (need ${cost})`
+        );
+      } else if (cost <= 0) {
+        throw new Error(`Invalid quantity`);
+      }
     }
   }
 };
