@@ -35,10 +35,25 @@ const changeHolding = (
   changeQuantity: number,
   purchasePrice?: number
 ) => {
-  return (holdings[id] = {
-    quantity: changeQuantity,
-    purchasePrice: purchasePrice
-  });
+  if (!holdings[id] && changeQuantity > 0) {
+    return (holdings[id] = {
+      quantity: changeQuantity,
+      purchasePrice: purchasePrice
+    });
+  } else if (holdings[id] && holdings[id].quantity + changeQuantity >= 0) {
+    return (holdings[id] = {
+      quantity: holdings[id].quantity + changeQuantity,
+      purchasePrice:
+        changeQuantity > 0
+          ? // Weighted average of previous price and current price
+            (holdings[id].purchasePrice * holdings[id].quantity +
+              changeQuantity * purchasePrice) /
+            (holdings[id].quantity + changeQuantity)
+          : // Selling shares doesn't change the purchase price
+            holdings[id].purchasePrice
+    });
+  }
+  throw new Error("Bad request");
 };
 
 export { getCashInHand, modifyFunds, getHoldings, getHolding, changeHolding };

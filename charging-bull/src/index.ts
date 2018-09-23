@@ -129,7 +129,7 @@ const resolvers = {
       }
 
       changeHolding(id, quantity, quote.latestPrice);
-
+      modifyFunds(cost);
       return {
         user: { id: SPUTNIK_USER_ID },
         holding: getHolding(id)
