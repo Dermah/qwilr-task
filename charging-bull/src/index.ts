@@ -3,7 +3,13 @@ import { GraphQLServer } from "graphql-yoga";
 import { IEXClient } from "iex-api";
 import { QuoteResponse } from "iex-api/apis/stocks";
 import * as _fetch from "isomorphic-fetch";
-import { getCashInHand, modifyFunds } from "./db";
+import {
+  getCashInHand,
+  modifyFunds,
+  changeHolding,
+  getHoldings,
+  getHolding
+} from "./db";
 
 const iex = new IEXClient(_fetch);
 
@@ -41,7 +47,9 @@ const typeDefs = `
   }
 
   type Holding {
+    id: ID!
     stock: Stock!
+    quantity: Int!
     purchasePrice: Float!
   }
 
@@ -81,7 +89,12 @@ const resolvers = {
     lists: () => ({})
   },
   User: {
-    cash: () => getCashInHand()
+    cash: () => getCashInHand(),
+    holdings: () => console.log(getHoldings()) || getHoldings()
+  },
+  Holding: {
+    id: ({ id }) => id,
+    stock: async ({ id }) => quoteToStock(await iex.stockQuote(id))
   },
   StockLists: {
     gainers: async () =>
@@ -114,6 +127,13 @@ const resolvers = {
       } else if (cost <= 0) {
         throw new Error(`Invalid quantity`);
       }
+
+      changeHolding(id, quantity, quote.latestPrice);
+
+      return {
+        user: { id: SPUTNIK_USER_ID },
+        holding: getHolding(id)
+      };
     }
   }
 };
