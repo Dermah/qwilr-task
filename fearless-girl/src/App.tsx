@@ -1,4 +1,6 @@
 import * as React from "react";
+import injectSheet, { Styles, WithSheet } from "react-jss";
+import { compose } from "recompose";
 
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
@@ -13,13 +15,25 @@ const client = new ApolloClient({
   uri: "http://192.168.1.4:4000"
 });
 
-class App extends React.Component {
+const styles: Styles = {
+  top: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-evenly"
+  }
+};
+
+interface InnerProps extends WithSheet<typeof styles> {}
+
+class App extends React.Component<InnerProps> {
   public render() {
     return (
       <ApolloProvider client={client}>
         <Page>
-          <AccountBalanceCard />
-          <Holdings />
+          <div className={this.props.classes.top}>
+            <AccountBalanceCard />
+            <Holdings />
+          </div>
           <StockLists />
           <Footer />
         </Page>
@@ -28,4 +42,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default compose<InnerProps, {}>(injectSheet(styles))(App);
