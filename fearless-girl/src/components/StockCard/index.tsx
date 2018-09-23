@@ -1,11 +1,43 @@
 import * as React from "react";
+import { graphql } from "react-apollo";
 import injectSheet, { Styles, WithSheet } from "react-jss";
-import { compose } from "recompose";
+import { compose, withHandlers, withState } from "recompose";
 
-import { Card, CardContent, Typography } from "@material-ui/core";
+import gql from "graphql-tag";
+
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  TextField,
+  Typography
+} from "@material-ui/core";
+
+const buyStock = gql`
+  mutation buyStockMutation($id: ID!, $quantity: Int!) {
+    buyStock(id: $id, quantity: $quantity) {
+      user {
+        id
+        cash
+        holdings {
+          id
+          stock {
+            id
+          }
+          quantity
+          purchasePrice
+        }
+      }
+    }
+  }
+`;
 
 const styles: Styles = {
   card: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-around",
     margin: "1em",
     width: "250px"
   },
@@ -20,9 +52,19 @@ interface Props {
   stock: Stock;
 }
 
-interface InnerProps extends WithSheet<typeof styles>, Props {}
+interface InnerProps extends WithSheet<typeof styles>, Props {
+  qty: string;
+  editQty: (e: string) => void;
+  executeBuy: () => void;
+}
 
-const StockCard = ({ classes, stock }: InnerProps) => (
+const StockCard = ({
+  qty,
+  editQty,
+  classes,
+  stock,
+  executeBuy
+}: InnerProps) => (
   <Card className={classes.card}>
     <CardContent>
       <div className={classes.header}>
@@ -35,7 +77,31 @@ const StockCard = ({ classes, stock }: InnerProps) => (
         {stock.name}
       </Typography>
     </CardContent>
+    <CardActions>
+      <TextField
+        placeholder="Quantity..."
+        value={qty}
+        onChange={e => editQty(e.target.value)}
+        type="number"
+      />
+      <Button
+        disabled={qty === ""}
+        onClick={() => executeBuy()}
+        color="primary"
+      >
+        Buy
+      </Button>
+    </CardActions>
   </Card>
 );
 
-export default compose<Props, Props>(injectSheet(styles))(StockCard);
+export default compose<Props, Props>(
+  withState("qty", "editQty", ""),
+  graphql(buyStock),
+  withHandlers({
+    executeBuy: ({ stock, qty, mutate }) => () => {
+      mutate({ variables: { id: stock.id, quantity: qty } });
+    }
+  }),
+  injectSheet(styles)
+)(StockCard);
