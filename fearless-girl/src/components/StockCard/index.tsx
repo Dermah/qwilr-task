@@ -3,8 +3,6 @@ import { graphql } from "react-apollo";
 import injectSheet, { Styles, WithSheet } from "react-jss";
 import { compose, withHandlers, withState } from "recompose";
 
-import gql from "graphql-tag";
-
 import {
   Button,
   Card,
@@ -14,25 +12,7 @@ import {
   Typography,
   Zoom
 } from "@material-ui/core";
-
-const buyStock = gql`
-  mutation buyStockMutation($id: ID!, $quantity: Int!) {
-    buyStock(id: $id, quantity: $quantity) {
-      user {
-        id
-        cash
-        holdings {
-          id
-          stock {
-            id
-          }
-          quantity
-          purchasePrice
-        }
-      }
-    }
-  }
-`;
+import buyStockMutation from "../../queries/buyStockMutation";
 
 const styles: Styles = {
   card: {
@@ -102,7 +82,7 @@ const StockCard = ({
 
 export default compose<Props, Props>(
   withState("qty", "editQty", ""),
-  graphql(buyStock),
+  graphql(buyStockMutation),
   withHandlers({
     executeBuy: ({ stock, qty, mutate }) => () => {
       mutate({ variables: { id: stock.id, quantity: qty } });

@@ -3,7 +3,7 @@ import injectSheet, { Styles, WithSheet } from "react-jss";
 import { compose } from "recompose";
 
 import gql from "graphql-tag";
-import { Query } from "react-apollo";
+import { graphql, MutationFn, Query } from "react-apollo";
 
 import {
   Paper,
@@ -14,6 +14,8 @@ import {
   TableRow,
   Zoom
 } from "@material-ui/core";
+import buyStockMutation from "../../queries/buyStockMutation";
+import SellField from "./SellField";
 
 const getFundsQuery = gql`
   query getHoldings {
@@ -34,9 +36,11 @@ const getFundsQuery = gql`
 
 const styles: Styles = {};
 
-interface InnerProps extends WithSheet<typeof styles> {}
+interface InnerProps extends WithSheet<typeof styles> {
+  mutate: MutationFn;
+}
 
-const AccountBalanceCard = ({ classes }: InnerProps) => (
+const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
       <Zoom in={true} style={{ transitionDelay: "200ms" }}>
@@ -47,7 +51,8 @@ const AccountBalanceCard = ({ classes }: InnerProps) => (
                 <TableCell>Holding</TableCell>
                 <TableCell numeric>Quantity</TableCell>
                 <TableCell numeric>Purchase Price</TableCell>
-                <TableCell numeric>Initial Value</TableCell>
+                <TableCell numeric>Total Initial Value</TableCell>
+                <TableCell>Sell</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -62,6 +67,18 @@ const AccountBalanceCard = ({ classes }: InnerProps) => (
                       <TableCell numeric>
                         {holding.quantity * holding.purchasePrice}
                       </TableCell>
+                      <TableCell>
+                        <SellField
+                          onSell={value =>
+                            mutate({
+                              variables: {
+                                id: holding.id,
+                                quantity: -1 * parseInt(value, 10)
+                              }
+                            })
+                          }
+                        />
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -73,4 +90,7 @@ const AccountBalanceCard = ({ classes }: InnerProps) => (
   </Query>
 );
 
-export default compose<InnerProps, {}>(injectSheet(styles))(AccountBalanceCard);
+export default compose<InnerProps, {}>(
+  graphql(buyStockMutation),
+  injectSheet(styles)
+)(AccountBalanceCard);
