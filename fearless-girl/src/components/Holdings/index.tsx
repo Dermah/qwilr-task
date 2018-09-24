@@ -92,6 +92,7 @@ const AccountBalanceCard = ({
                       </TableCell>
                       <TableCell>
                         <SellField
+                          key={holding.quantity}
                           disabled={mutationInFlight}
                           onSell={async value => {
                             mutating(true);
