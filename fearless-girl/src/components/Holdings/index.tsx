@@ -11,7 +11,8 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Zoom
 } from "@material-ui/core";
 
 const getFundsQuery = gql`
@@ -38,34 +39,36 @@ interface InnerProps extends WithSheet<typeof styles> {}
 const AccountBalanceCard = ({ classes }: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Holding</TableCell>
-              <TableCell numeric>Quantity</TableCell>
-              <TableCell numeric>Purchase Price</TableCell>
-              <TableCell numeric>Initial Value</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!loading &&
-              !error &&
-              data.viewer.holdings.map((holding: Holding) => {
-                return (
-                  <TableRow key={holding.id}>
-                    <TableCell>{holding.id}</TableCell>
-                    <TableCell numeric>{holding.quantity}</TableCell>
-                    <TableCell numeric>{holding.purchasePrice}</TableCell>
-                    <TableCell numeric>
-                      {holding.quantity * holding.purchasePrice}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </Paper>
+      <Zoom in={true} style={{ transitionDelay: "200ms" }}>
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Holding</TableCell>
+                <TableCell numeric>Quantity</TableCell>
+                <TableCell numeric>Purchase Price</TableCell>
+                <TableCell numeric>Initial Value</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {!loading &&
+                !error &&
+                data.viewer.holdings.map((holding: Holding) => {
+                  return (
+                    <TableRow key={holding.id}>
+                      <TableCell>{holding.id}</TableCell>
+                      <TableCell numeric>{holding.quantity}</TableCell>
+                      <TableCell numeric>{holding.purchasePrice}</TableCell>
+                      <TableCell numeric>
+                        {holding.quantity * holding.purchasePrice}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Zoom>
     )}
   </Query>
 );

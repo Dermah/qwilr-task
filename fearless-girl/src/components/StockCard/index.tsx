@@ -11,7 +11,8 @@ import {
   CardActions,
   CardContent,
   TextField,
-  Typography
+  Typography,
+  Zoom
 } from "@material-ui/core";
 
 const buyStock = gql`
@@ -50,6 +51,7 @@ const styles: Styles = {
 
 interface Props {
   stock: Stock;
+  transitionDelay?: number;
 }
 
 interface InnerProps extends WithSheet<typeof styles>, Props {
@@ -63,36 +65,39 @@ const StockCard = ({
   editQty,
   classes,
   stock,
-  executeBuy
+  executeBuy,
+  transitionDelay = 0
 }: InnerProps) => (
-  <Card className={classes.card}>
-    <CardContent>
-      <div className={classes.header}>
-        <Typography variant="headline" component="h2">
-          {stock.id}
+  <Zoom in={true} style={{ transitionDelay: `${transitionDelay}ms` }}>
+    <Card className={classes.card}>
+      <CardContent>
+        <div className={classes.header}>
+          <Typography variant="headline" component="h2">
+            {stock.id}
+          </Typography>
+          <Typography variant="subheading">${stock.latestPrice}</Typography>
+        </div>
+        <Typography variant="subheading" component="h3">
+          {stock.name}
         </Typography>
-        <Typography variant="subheading">${stock.latestPrice}</Typography>
-      </div>
-      <Typography variant="subheading" component="h3">
-        {stock.name}
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <TextField
-        placeholder="Quantity..."
-        value={qty}
-        onChange={e => editQty(e.target.value)}
-        type="number"
-      />
-      <Button
-        disabled={qty === ""}
-        onClick={() => executeBuy()}
-        color="primary"
-      >
-        Buy
-      </Button>
-    </CardActions>
-  </Card>
+      </CardContent>
+      <CardActions>
+        <TextField
+          placeholder="Quantity..."
+          value={qty}
+          onChange={e => editQty(e.target.value)}
+          type="number"
+        />
+        <Button
+          disabled={qty === ""}
+          onClick={() => executeBuy()}
+          color="primary"
+        >
+          Buy
+        </Button>
+      </CardActions>
+    </Card>
+  </Zoom>
 );
 
 export default compose<Props, Props>(

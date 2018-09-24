@@ -10,6 +10,7 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
+import Zoom from "@material-ui/core/Zoom";
 
 import EditFundsModal from "../EditFundsModal";
 
@@ -43,26 +44,28 @@ const AccountBalanceCard = ({
 }: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
-      <Card className={classes.card}>
-        <CardHeader title="Account Balance" />
-        <CardContent>
-          $
-          {(data &&
-            data.viewer &&
-            typeof data.viewer.cash === "number" &&
-            data.viewer.cash.toString()) ||
-            "-"}
-        </CardContent>
-        <CardActions className={classes.actionArea}>
-          <Button color="primary" onClick={() => changeModalOpen(true)}>
-            Change Balance
-          </Button>
-        </CardActions>
-        <EditFundsModal
-          onClose={() => changeModalOpen(false)}
-          open={modalOpen}
-        />
-      </Card>
+      <Zoom in={true} style={{ transitionDelay: "200ms" }}>
+        <Card className={classes.card}>
+          <CardHeader title="Account Balance" />
+          <CardContent>
+            $
+            {(data &&
+              data.viewer &&
+              typeof data.viewer.cash === "number" &&
+              data.viewer.cash.toString()) ||
+              "-"}
+          </CardContent>
+          <CardActions className={classes.actionArea}>
+            <Button color="primary" onClick={() => changeModalOpen(true)}>
+              Change Balance
+            </Button>
+          </CardActions>
+          <EditFundsModal
+            onClose={() => changeModalOpen(false)}
+            open={modalOpen}
+          />
+        </Card>
+      </Zoom>
     )}
   </Query>
 );

@@ -44,7 +44,7 @@ const StockLists = ({ classes }: InnerProps) => (
               <Typography variant="display1">Today's Gainers</Typography>
               <div className={classes.listSection}>
                 {(data.lists.gainers as Stock[]).map((stock, i) => (
-                  <StockCard key={i} stock={stock} />
+                  <StockCard key={i} stock={stock} transitionDelay={i * 50} />
                 ))}
               </div>
             </React.Fragment>
