@@ -22,6 +22,16 @@ const styles: Styles = {
     alignItems: "center",
     display: "flex",
     justifyContent: "space-between"
+  },
+  section: {
+    alignItems: "center",
+    display: "flex",
+    justifyContent: "space-around",
+    minHeight: "200px",
+    width: "100%"
+  },
+  title: {
+    marginTop: "2em"
   }
 };
 
@@ -49,33 +59,37 @@ const BuyStockArea = ({
   executeBuy,
   data
 }: InnerProps) => (
-  <React.Fragment>
-    <Typography variant="title">Stock Lookup</Typography>
-    <TextField
-      value={stockCode}
-      onChange={e => editStockCode(e.target.value)}
-      title="Code"
-    />
+  <>
+    <Typography className={classes.title} variant="display1">
+      Stock Lookup
+    </Typography>
+    <section className={classes.section}>
+      <TextField
+        value={stockCode}
+        onChange={e => editStockCode(e.target.value)}
+        label="Stock code"
+      />
 
-    <Query query={stockQuery} variables={{ id: stockCode }}>
-      {({ networkStatus, error, data: stockData }) => {
-        if (stockCode === "") {
-          return <div />;
-        } else if (isNetworkRequestInFlight(networkStatus)) {
-          return (
-            <React.Fragment>
-              <CircularProgress /> Searching...
-            </React.Fragment>
-          );
-        } else if (error) {
-          return <div>Could not find stock code</div>;
-        } else if (stockData && stockData.stock) {
-          return <StockCard stock={stockData.stock} />;
-        }
-        return <div>Unknown error occured</div>;
-      }}
-    </Query>
-  </React.Fragment>
+      <Query query={stockQuery} variables={{ id: stockCode }}>
+        {({ networkStatus, error, data: stockData }) => {
+          if (stockCode === "") {
+            return <div />;
+          } else if (isNetworkRequestInFlight(networkStatus)) {
+            return (
+              <div>
+                <CircularProgress /> Searching...
+              </div>
+            );
+          } else if (error) {
+            return <div>Could not find stock code</div>;
+          } else if (stockData && stockData.stock) {
+            return <StockCard stock={stockData.stock} />;
+          }
+          return <div>Unknown error occured</div>;
+        }}
+      </Query>
+    </section>
+  </>
 );
 
 export default compose<InnerProps, {}>(
