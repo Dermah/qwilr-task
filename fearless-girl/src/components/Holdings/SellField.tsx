@@ -16,6 +16,7 @@ const SellField = compose<SellFieldInnerProps, SellFieldProps>(
 )(({ value, changeValue, onSell }) => (
   <>
     <TextField
+      disabled={disabled}
       value={value}
       onChange={e => changeValue(e.target.value)}
       placeholder="Quantity..."

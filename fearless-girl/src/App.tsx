@@ -6,7 +6,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
 import AccountBalanceCard from "./components/AccountBalanceCard";
-import BuyStock from "./components/BuyStock";
+import BuyStock from "./components/BuyStockArea";
 import Footer from "./components/Footer";
 import Holdings from "./components/Holdings";
 import Page from "./components/Page";

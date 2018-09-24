@@ -1,10 +1,9 @@
 import * as React from "react";
-import { graphql, Query } from "react-apollo";
+import { Query } from "react-apollo";
 import injectSheet, { Styles, WithSheet } from "react-jss";
-import { compose, withHandlers, withState } from "recompose";
+import { compose, withState } from "recompose";
 
 import { isNetworkRequestInFlight } from "apollo-client/core/networkStatus";
-import buyStockMutation from "../../queries/buyStockMutation";
 
 import { CircularProgress, TextField, Typography } from "@material-ui/core";
 import gql from "graphql-tag";
@@ -48,17 +47,9 @@ const stockQuery = gql`
 interface InnerProps extends WithSheet<typeof styles> {
   stockCode: string;
   editStockCode: (e: string) => void;
-  executeBuy: () => void;
-  data: any;
 }
 
-const BuyStockArea = ({
-  stockCode,
-  editStockCode,
-  classes,
-  executeBuy,
-  data
-}: InnerProps) => (
+const BuyStockArea = ({ stockCode, editStockCode, classes }: InnerProps) => (
   <>
     <Typography className={classes.title} variant="display1">
       Stock Lookup
@@ -94,11 +85,5 @@ const BuyStockArea = ({
 
 export default compose<InnerProps, {}>(
   withState("stockCode", "editStockCode", ""),
-  graphql(buyStockMutation),
-  withHandlers({
-    executeBuy: ({ stock, qty, mutate }) => () => {
-      mutate({ variables: { id: stock.id, quantity: qty } });
-    }
-  }),
   injectSheet(styles)
 )(BuyStockArea);
