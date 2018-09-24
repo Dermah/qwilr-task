@@ -6,6 +6,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
 import AccountBalanceCard from "./components/AccountBalanceCard";
+import BuyStock from "./components/BuyStock";
 import Footer from "./components/Footer";
 import Holdings from "./components/Holdings";
 import Page from "./components/Page";
@@ -34,6 +35,7 @@ class App extends React.Component<InnerProps> {
             <AccountBalanceCard />
             <Holdings />
           </div>
+          <BuyStock />
           <StockLists />
           <Footer />
         </Page>
