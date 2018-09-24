@@ -84,8 +84,9 @@ export default compose<Props, Props>(
   withState("qty", "editQty", ""),
   graphql(buyStockMutation),
   withHandlers({
-    executeBuy: ({ stock, qty, mutate }) => () => {
-      mutate({ variables: { id: stock.id, quantity: qty } });
+    executeBuy: ({ stock, qty, editQty, mutate }) => async () => {
+      await mutate({ variables: { id: stock.id, quantity: qty } });
+      editQty("");
     }
   }),
   injectSheet(styles)
