@@ -5,6 +5,7 @@ import { Button, TextField } from "@material-ui/core";
 
 interface SellFieldProps {
   onSell: (e: string) => void;
+  disabled: boolean;
 }
 interface SellFieldInnerProps extends SellFieldProps {
   value: string;
@@ -13,7 +14,7 @@ interface SellFieldInnerProps extends SellFieldProps {
 
 const SellField = compose<SellFieldInnerProps, SellFieldProps>(
   withState("value", "changeValue", "")
-)(({ value, changeValue, onSell }) => (
+)(({ value, changeValue, onSell, disabled }) => (
   <>
     <TextField
       disabled={disabled}
@@ -23,7 +24,7 @@ const SellField = compose<SellFieldInnerProps, SellFieldProps>(
       type="number"
     />
     <Button
-      disabled={value === "" || parseInt(value, 10) <= 0}
+      disabled={disabled || value === "" || parseInt(value, 10) <= 0}
       onClick={() => onSell(value)}
     >
       Sell

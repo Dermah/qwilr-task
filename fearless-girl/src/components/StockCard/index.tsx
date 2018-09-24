@@ -8,6 +8,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  CircularProgress,
   TextField,
   Typography,
   Zoom
@@ -38,6 +39,7 @@ interface InnerProps extends WithSheet<typeof styles>, Props {
   qty: string;
   editQty: (e: string) => void;
   executeBuy: () => void;
+  mutationInFlight: boolean;
 }
 
 const StockCard = ({
@@ -46,7 +48,8 @@ const StockCard = ({
   classes,
   stock,
   executeBuy,
-  transitionDelay = 0
+  transitionDelay = 0,
+  mutationInFlight
 }: InnerProps) => (
   <Zoom in={true} style={{ transitionDelay: `${transitionDelay}ms` }}>
     <Card className={classes.card}>
@@ -68,13 +71,17 @@ const StockCard = ({
           onChange={e => editQty(e.target.value)}
           type="number"
         />
-        <Button
-          disabled={qty === ""}
-          onClick={() => executeBuy()}
-          color="primary"
-        >
-          Buy
-        </Button>
+        {mutationInFlight ? (
+          <CircularProgress />
+        ) : (
+          <Button
+            disabled={qty === ""}
+            onClick={() => executeBuy()}
+            color="primary"
+          >
+            Buy
+          </Button>
+        )}
       </CardActions>
     </Card>
   </Zoom>
@@ -82,11 +89,18 @@ const StockCard = ({
 
 export default compose<Props, Props>(
   withState("qty", "editQty", ""),
+  withState("mutationInFlight", "mutating", false),
   graphql(buyStockMutation),
   withHandlers({
-    executeBuy: ({ stock, qty, editQty, mutate }) => async () => {
-      await mutate({ variables: { id: stock.id, quantity: qty } });
+    executeBuy: ({ stock, qty, editQty, mutate, mutating }) => async () => {
+      mutating(true);
+      try {
+        await mutate({ variables: { id: stock.id, quantity: qty } });
+      } catch (e) {
+        mutating(false);
+      }
       editQty("");
+      mutating(false);
     }
   }),
   injectSheet(styles)

@@ -1,11 +1,12 @@
 import * as React from "react";
 import injectSheet, { Styles, WithSheet } from "react-jss";
-import { compose } from "recompose";
+import { compose, withState } from "recompose";
 
 import gql from "graphql-tag";
 import { graphql, MutationFn, Query } from "react-apollo";
 
 import {
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -34,17 +35,33 @@ const getFundsQuery = gql`
   }
 `;
 
-const styles: Styles = {};
+const styles: Styles = {
+  spinner: {
+    position: "absolute",
+    right: "1.5em",
+    top: "1.5em"
+  }
+};
 
 interface InnerProps extends WithSheet<typeof styles> {
   mutate: MutationFn;
+  mutationInFlight: boolean;
+  mutating: (e: boolean) => void;
 }
 
-const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
+const AccountBalanceCard = ({
+  classes,
+  mutate,
+  mutationInFlight,
+  mutating
+}: InnerProps) => (
   <Query query={getFundsQuery}>
     {({ loading, error, data }) => (
       <Zoom in={true} style={{ transitionDelay: "200ms" }}>
         <Paper className={classes.root}>
+          {mutationInFlight ? (
+            <CircularProgress className={classes.spinner} size={25} />
+          ) : null}
           <Table className={classes.table}>
             <TableHead>
               <TableRow>
@@ -75,14 +92,21 @@ const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
                       </TableCell>
                       <TableCell>
                         <SellField
-                          onSell={value =>
-                            mutate({
-                              variables: {
-                                id: holding.id,
-                                quantity: -1 * parseInt(value, 10)
-                              }
-                            })
-                          }
+                          disabled={mutationInFlight}
+                          onSell={async value => {
+                            mutating(true);
+                            try {
+                              await mutate({
+                                variables: {
+                                  id: holding.id,
+                                  quantity: -1 * parseInt(value, 10)
+                                }
+                              });
+                            } catch (e) {
+                              console.log(e);
+                            }
+                            mutating(false);
+                          }}
                         />
                       </TableCell>
                     </TableRow>
@@ -97,6 +121,7 @@ const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
 );
 
 export default compose<InnerProps, {}>(
+  withState("mutationInFlight", "mutating", false),
   graphql(buyStockMutation),
   injectSheet(styles)
 )(AccountBalanceCard);
