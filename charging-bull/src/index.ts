@@ -125,8 +125,6 @@ const resolvers = {
         throw new Error(
           `Not enough funds to pay for ${quantity} of ${ID} (need $${cost})`
         );
-      } else if (cost <= 0) {
-        throw new Error(`Invalid quantity`);
       }
 
       changeHolding(ID, quantity, quote.latestPrice);
