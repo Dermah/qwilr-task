@@ -40,7 +40,7 @@ const changeHolding = (
       quantity: changeQuantity,
       purchasePrice: purchasePrice
     });
-  } else if (holdings[id] && holdings[id].quantity + changeQuantity >= 0) {
+  } else if (holdings[id] && holdings[id].quantity + changeQuantity > 0) {
     return (holdings[id] = {
       quantity: holdings[id].quantity + changeQuantity,
       purchasePrice:
@@ -52,6 +52,8 @@ const changeHolding = (
           : // Selling shares doesn't change the purchase price
             holdings[id].purchasePrice
     });
+  } else if (holdings[id] && holdings[id].quantity + changeQuantity === 0) {
+    return delete holdings[id];
   }
   throw new Error("Bad request");
 };
