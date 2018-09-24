@@ -52,7 +52,7 @@ const AccountBalanceCard = ({
             {(data &&
               data.viewer &&
               typeof data.viewer.cash === "number" &&
-              data.viewer.cash.toString()) ||
+              data.viewer.cash.toFixed(2)) ||
               "-"}
           </CardContent>
           <CardActions className={classes.actionArea}>

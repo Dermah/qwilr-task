@@ -51,7 +51,8 @@ const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
                 <TableCell>Holding</TableCell>
                 <TableCell numeric>Quantity</TableCell>
                 <TableCell numeric>Purchase Price</TableCell>
-                <TableCell numeric>Total Initial Value</TableCell>
+                <TableCell numeric>Initial Value</TableCell>
+                <TableCell numeric>Current Value</TableCell>
                 <TableCell>Sell</TableCell>
               </TableRow>
             </TableHead>
@@ -65,7 +66,12 @@ const AccountBalanceCard = ({ classes, mutate }: InnerProps) => (
                       <TableCell numeric>{holding.quantity}</TableCell>
                       <TableCell numeric>{holding.purchasePrice}</TableCell>
                       <TableCell numeric>
-                        {holding.quantity * holding.purchasePrice}
+                        {(holding.quantity * holding.purchasePrice).toFixed(2)}
+                      </TableCell>
+                      <TableCell numeric>
+                        {(holding.quantity * holding.stock.latestPrice).toFixed(
+                          2
+                        )}
                       </TableCell>
                       <TableCell>
                         <SellField

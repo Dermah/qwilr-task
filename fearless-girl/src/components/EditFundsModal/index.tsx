@@ -93,7 +93,11 @@ const Page = ({
             <Query query={getFundsQuery}>
               {({ loading, error, data }) => (
                 <DialogContentText>
-                  You currently have ${data && data.viewer && data.viewer.cash}{" "}
+                  You currently have $
+                  {data &&
+                    data.viewer &&
+                    data.viewer.cash &&
+                    data.viewer.cash.toFixed(2)}{" "}
                   in funds
                 </DialogContentText>
               )}
